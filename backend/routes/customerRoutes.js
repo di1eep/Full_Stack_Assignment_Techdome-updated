@@ -4,6 +4,7 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const Customer = require('../schemas/customerSchema');
 
+
 // Customer Registration
 router.post('/register', async (req, res) => {
   const { username, mobileNumber, email, password } = req.body;
@@ -33,6 +34,7 @@ router.post('/register', async (req, res) => {
     res.status(500).send('Server Error');
   }
 });
+
 
 // Customer Login
 router.post('/login', async (req, res) => {
