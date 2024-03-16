@@ -1,75 +1,107 @@
-const express = require('express');
+const express = require("express");
+const bcrypt = require("bcryptjs");
+const jwt = require("jsonwebtoken");
+const mongoose = require("mongoose");
+const Customer = require("../schemas/customerSchema");
+const Loan = require("../schemas/loanSchema");
+const { authenticateToken } = require("../middleware/auth");
+
 const router = express.Router();
-const bcrypt = require('bcryptjs');
-const jwt = require('jsonwebtoken');
-const Customer = require('../schemas/customerSchema');
+const userId = new mongoose.Types.ObjectId();
 
-
-// Customer Registration
-router.post('/register', async (req, res) => {
-  const { username, mobileNumber, email, password } = req.body;
-
+// Register ✅
+router.post("/register", async (req, res) => {
   try {
-    let customer = await Customer.findOne({ email });
+    const { username, email, mobileNumber, password, userType } = req.body;
 
-    if (customer) {
-      return res.status(400).json({ msg: 'User already exists' });
+    // Check if userType is customer
+    if (userType !== "customer") {
+      return res.status(400).send("Invalid user type");
     }
 
-    customer = new Customer({
+    // Hash the password securely
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    // Generate random userId
+    const userId = new mongoose.Types.ObjectId();
+
+    // Create new customer with random userId
+    const user = new Customer({
+      userId,
       username,
-      mobileNumber,
       email,
-      password,
+      mobileNumber,
+      password: hashedPassword,
+      userType,
     });
 
-    const salt = await bcrypt.genSalt(10);
-    customer.password = await bcrypt.hash(password, salt);
-
-    await customer.save();
-
-    res.status(201).json({ msg: 'Customer registered successfully' });
+    await user.save();
+    res.status(201).send("User registered successfully");
   } catch (err) {
-    console.error(err.message);
-    res.status(500).send('Server Error');
+    console.error(err);
+    res.status(500).send("Error registering user: " + err.message);
   }
 });
 
+module.exports = router;
 
-// Customer Login
-router.post('/login', async (req, res) => {
-  const { email, password } = req.body;
-
+// Login ✅
+router.post("/login", async (req, res) => {
   try {
-    // Check if the customer exists
-    const customer = await Customer.findOne({ email });
-    if (!customer) {
-      return res.status(400).json({ msg: 'Invalid credentials' });
+    const { email, password } = req.body;
+    const user = await Customer.findOne({ email });
+
+    // Check if user exists and is a customer
+    if (!user || user.userType !== "customer") {
+      return res.status(400).send("Invalid Email or Password");
     }
 
-    // Validate password
-    const isPasswordValid = await bcrypt.compare(password, customer.password);
-    if (!isPasswordValid) {
-      return res.status(400).json({ msg: 'Invalid credentials' });
+    const validPassword = await bcrypt.compare(password, user.password);
+    if (!validPassword) {
+      return res.status(400).send("Invalid Email or Password");
     }
 
-    // Create and send a JWT token
-    const token = jwt.sign({ customerId: customer._id }, 'your-secret-key', {
-      expiresIn: '1h', // Token expires in 1 hour
-    });
-
-    res.json({ token });
+    const accessToken = jwt.sign(
+      { email: user.email, userType: user.userType },
+      process.env.ACCESS_TOKEN_SECRET
+    );
+    res.json({ accessToken });
   } catch (err) {
-    console.error(err.message);
-    res.status(500).send('Server Error');
+    console.error(err);
+    res.status(500).send("Error logging in: " + err.message);
   }
 });
 
 
-// apply loan 
-router.post('/apply-loan', authMiddleware, async (req, res) => {
+// Fetch Loans for Customer  ✅
+router.get("/loans", authenticateToken, async (req, res) => {
+  try {
+    // Check if user is authenticated and is a customer
+    if (req.user.userType !== "customer") {
+      return res.status(400).send("Invalid user type");
+    }
+
+    const user = await Customer.findOne({ email: req.user.email });
+    if (!user) {
+      return res.status(404).send("User not found");
+    }
+
+    const loans = await Loan.find({ customerId: user._id });
+    res.json(loans);
+  } catch (err) {
+    console.error("Error fetching loans:", err);
+    res.status(500).send("Error fetching loans: " + err.message);
+  }
+});
+
+
+
+// Apply for Loan  ✅
+// Assuming the Loan schema is correctly defined as shown in your previous code
+
+router.post('/apply-loan', authenticateToken, async (req, res) => {
   const { amount, tenure } = req.body;
-  const customerId = req.customer.id; // Assuming you have middleware to get customer details
+  const customerId = req.user.userId; // Use req.user.userId to get the customer ID
 
   try {
     // Check if amount and tenure are provided
@@ -96,7 +128,7 @@ router.post('/apply-loan', authMiddleware, async (req, res) => {
 
     // Record the loan application
     const loan = new Loan({
-      customerId,
+      customerId, // Assign the customerId here
       amount,
       tenure,
       interestRate,
@@ -112,6 +144,7 @@ router.post('/apply-loan', authMiddleware, async (req, res) => {
     res.status(500).send('Server Error');
   }
 });
+
 
 
 

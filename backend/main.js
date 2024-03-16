@@ -1,30 +1,26 @@
-const express = require("express");
-const mongoose = require("mongoose");
-const bodyParser = require("body-parser");
+const customerRoutes = require('./routes/customerRoutes');
+const lenderRoutes = require('./routes/lenderRoutes');
+const MONGODB_URI = process.env.MONGODB_URI;
+const ACCESS_TOKEN_SECRET = process.env.ACCESS_TOKEN_SECRET;
+
+
+
+const express = require('express');
+const mongoose = require('mongoose');
+require('dotenv').config();
 
 const app = express();
+app.use(express.json());
 
-// Middleware
-app.use(bodyParser.json());
 
-// Connect to MongoDB
-mongoose
-  .connect(
-    "mongodb+srv://pd9505424580:2pOoySPF9yTWac3B@cluster0.uvnlyys.mongodb.net/loanApp",
-    {
-      useNewUrlParser: true,
-      useUnifiedTopology: true,
-    }
-  )
-  .then(() => console.log("MongoDB connected"))
-  .catch((err) => console.log(err));
 
-// Routes
-const customerRouter = require("./routes/customerRoutes");
-const lenderRouter = require("./routes/lenderRoutes");
+mongoose.connect(process.env.MONGODB_URI, { useNewUrlParser: true, useUnifiedTopology: true })
+  .then(() => console.log('Connected to MongoDB'))
+  .catch(err => console.error('Error connecting to MongoDB:', err));
 
-app.use("/api/customer", customerRouter);
-app.use("/api/lender", lenderRouter);
+app.use('/api/customer', customerRoutes);
+app.use('/api/lender', lenderRoutes);
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+ 

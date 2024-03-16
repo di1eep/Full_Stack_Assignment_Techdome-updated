@@ -1,23 +1,36 @@
+// userSchema.js
+
 const mongoose = require('mongoose');
 
-const CustomerSchema = new mongoose.Schema({
+const userSchema = new mongoose.Schema({
   username: {
     type: String,
-    required: true,
-  },
-  mobileNumber: {
-    type: String,
-    required: true,
+    required: true
   },
   email: {
     type: String,
     required: true,
-    unique: true,
+    unique: true
+  },
+  mobileNumber: {
+    type: String,
+    required: true,
+    unique: true
   },
   password: {
     type: String,
-    required: true,
+    required: true
   },
+  userType: {
+    type: String,
+    enum: ['customer', 'lender'],
+    required: true
+  },
+  userId: {
+    type: mongoose.Schema.Types.ObjectId,
+    required: true,
+    unique: true
+  }
 });
 
-module.exports = mongoose.model('Customer', CustomerSchema);
+module.exports = mongoose.model('User', userSchema);
