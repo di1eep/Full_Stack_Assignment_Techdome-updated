@@ -1,0 +1,69 @@
+Login
+Signup
+
+
+Loan - Request - Form
+    amount loan_term
+
+Customer Dashboard -
+    Create loan Request Form
+        amount
+        term
+        current_date
+    View Loans 
+    on click of a approved loan - open repayment page 
+    Repayment Page - 
+        loan amount 
+        number of terms 
+        terms with status
+        terms paid 
+        upcoming terms 
+        pay current pending term - term amount by default 
+        pay custom amount - user can enter any amount that should be less than total loan remaining amount 
+        after payment we need to mark a term as paid by default it will be pending
+
+        if all the terms are paid we will show loan paid
+        and hide all the repayment fields
+
+Admin Dashboard -
+    all loans list
+    loan approve button 
+
+
+
+
+Components
+    CustomerLoginPage.js
+    CustomerSignupPage.js
+    AdminLoginPage.js
+
+    CustomerDashboard.js
+        LoanList.js => Table to show all loans
+    CreateLoan.js
+        Form
+    RepaymentPage.js
+        LoanTermList => Table to show all term of the particular loan
+        Card
+            Total Loan Amount
+            Total Number of Terms
+            Number of Terms paid
+            Terms details => date,amount,term number
+        RepaymentForm
+            Input - amount => default disabled => default value term amount
+            Button - enter custom amount 
+                OnClick of Button we will make Input editable
+            Submission Button => Pay Now
+
+    AdminDashboard.js
+        Table => list of all loans with details, amount terms etc. customer name
+            button to approve a loan
+
+
+
+Update me at 
+
+4:45
+
+5:45
+
+7:00 pm
