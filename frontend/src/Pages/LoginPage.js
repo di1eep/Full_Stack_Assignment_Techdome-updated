@@ -1,7 +1,9 @@
 import React, { useState } from "react";
 import { Form, Button, Container, Row, Col } from "react-bootstrap";
 import axios from "axios";
-import { useNavigate,useLocation } from "react-router-dom";
+import { useNavigate,useLocation ,Link } from "react-router-dom";
+
+
 
 const LoginPage = () => {
   const [email, setEmail] = useState("");
@@ -23,6 +25,7 @@ const LoginPage = () => {
       console.log("Login Successful:", token);
       window.alert("Login Successful: Redirecting to Dashboard");
 
+
       localStorage.setItem("loanAppToken",token);
 
       if(location.pathname === "/customer/login"){
@@ -38,7 +41,13 @@ const LoginPage = () => {
   };
 
   return (
-    <Container>
+     
+    <>
+
+
+    <Container className="container">
+        
+
       <Row className="justify-content-md-center mt-5">
         <Col xs={12} md={6}>
           <h2>Login</h2>
@@ -69,10 +78,16 @@ const LoginPage = () => {
             <Button variant="primary" className="mt-2" type="submit">
               Submit
             </Button>
+            <Link to="/customer/signup">
+                 <p>New to Loan App ?</p> 
+                <button type="button">SignUp</button>
+             </Link>
           </Form>
         </Col>
       </Row>
     </Container>
+    </>
+    
   );
 };
 
