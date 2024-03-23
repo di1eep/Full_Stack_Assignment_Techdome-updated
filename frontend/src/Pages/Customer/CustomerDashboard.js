@@ -1,9 +1,14 @@
 import React, { useState, useEffect } from "react";
 import LoansListTable from "./LoansListTable";
 import axios from "axios";
-import { useNavigate } from "react-router-dom";
+import {Link,  useNavigate } from "react-router-dom";
 import Button from "react-bootstrap/Button";
 import NewLoanModal from "./NewLoanModal";
+
+
+
+
+
 
 function CustomerDashboard() {
   const [loans, setLoans] = useState([]);
@@ -12,8 +17,19 @@ function CustomerDashboard() {
   const [error, setError] = useState("");
   const [showModal, setShowModal] = useState(false);
   const token = localStorage.getItem("loanAppToken");
+  const [loanId, setLoanId] = useState("");
 
   const navigate = useNavigate();
+
+  const handleNavigateToPayment = () => {
+    if (!loanId.trim()) {
+      alert("Please enter a valid loan ID.");
+      return;
+    }
+
+    const formattedLoanId = loanId.replace(/\s+/g, '-'); // Optional input sanitation
+    navigate(`/loans/customer/pay/${formattedLoanId}`);
+  };
 
   useEffect(() => {
     const fetchData = async () => {
@@ -73,9 +89,15 @@ function CustomerDashboard() {
     }
   };
 
+    
+
+
+
   return (
     <div>
-      <p className="my-6">Customer Dashboard</p>
+          
+          <loans>
+          <p className="my-6">Customer Dashboard</p>
       <Button onClick={() => setShowModal(true)}>New Loan</Button>
       <NewLoanModal
         showModal={showModal}
@@ -88,6 +110,23 @@ function CustomerDashboard() {
         error={error}
       />
       {loans.length > 0 ? <LoansListTable loans={loans} /> : "No Loans to show"}
+          </loans>
+
+       
+          <input
+        type="text"
+        placeholder="Enter Loan ID"
+        value={loanId}
+        onChange={(e) => setLoanId(e.target.value)}
+      />
+      <Link to={`/customer/loan/${loanId}`}>
+        <Button onClick={handleNavigateToPayment} disabled={!loanId}>
+          Make Payment
+        </Button>
+      </Link>
+      
+          
+
     </div>
   );
 }

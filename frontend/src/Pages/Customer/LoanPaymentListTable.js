@@ -91,13 +91,6 @@ function LoanPaymentListTable() {
             value={paymentAmount}
             onChange={handleInputChange}
           />
-          <button
-            type="button"
-            className="btn btn-success"
-            onClick={handlePayment}
-          >
-            Pay Now
-          </button>
         </div>
       )}
     </div>

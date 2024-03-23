@@ -12,7 +12,7 @@ app.use("/loans", loanRoutes);
 
 mongoose
   .connect(
-    "mongodb+srv://harshityadav:JxsV3y4V7mWl8g1I@cluster0.s9trpdc.mongodb.net/loanManagementDB"
+    "mongodb+srv://pd9505424580:2pOoySPF9yTWac3B@cluster0.uvnlyys.mongodb.net/loanManagementDB"
   )
   .then(() => {
     console.log("Connected to MongoDB");
